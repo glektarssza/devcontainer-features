@@ -3,6 +3,7 @@
         "github.remotehub",
         "github.vscode-pull-request-github",
         "github.vscode-github-actions",
+        "ms-vscode-remote.remote-containers",
         "timonwong.shellcheck"
     ]
 }
