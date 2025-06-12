@@ -1,0 +1,10 @@
+{
+    "id": "hello",
+    "version": "0.0.0",
+    "name": "Hello world",
+    "description": "A simple \"hello world\" example dev container feature.",
+    "documentationURL": "https://github.com/glektarssza/devcontainer-features/tree/main/src/hello",
+    "licenseURL": "https://github.com/glektarssza/devcontainer-features/blob/main/LICENSE.md",
+    "keywords": ["hello", "world"],
+    "options": {}
+}
