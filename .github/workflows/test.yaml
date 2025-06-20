@@ -30,6 +30,8 @@ jobs:
       checks: write
     outputs:
       check-id: ${{steps.setup-checks.outputs.check-id}}
+    env:
+      GITHUB_TOKEN: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
     steps:
       - id: setup-checks
         name: Setup check(s)
@@ -100,6 +102,8 @@ jobs:
     permissions:
       #-- Needed to update check statuses
       checks: write
+    env:
+      GITHUB_TOKEN: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
     steps:
       - id: finalize-checks
         name: Finalize checks
