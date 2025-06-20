@@ -1,5 +1,7 @@
 # Dev Container Features #
 
+[![On Push](https://github.com/glektarssza/devcontainer-features/actions/workflows/on-push.yaml/badge.svg)](https://github.com/glektarssza/devcontainer-features/actions/workflows/on-push.yaml)
+
 A collection of useful dev container features I've created.
 
 <!-- omit in toc -->
