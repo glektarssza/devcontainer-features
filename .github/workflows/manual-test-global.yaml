@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Manual Test Global
+on:
+  workflow_dispatch:
+jobs:
+  test-global:
+    name: Test Global
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/test-global.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

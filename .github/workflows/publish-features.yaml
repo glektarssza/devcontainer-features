@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Release
+on:
+  workflow_call:
+    secrets:
+      github-token:
+        description: |
+          The token to use for making authenticated calls to the GitHub APIs.
+        required: false
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      #-- Needed to clone repository
+      contents: read
+      #-- Needed to publish updated devcontainer features
+      packages: write
+    steps:
+      - id: checkout-repository
+        name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          clean: true
+          lfs: true
+          submodules: recursive
+          token: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
+      - id: publish
+        name: Publish
+        if: github.ref == 'refs/heads/main'
+        uses: devcontainers/action@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
+        with:
+          publish-features: true
+          base-path-to-features: ./src/
+          disable-repo-tagging: true
