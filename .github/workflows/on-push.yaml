@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: On Push
+on:
+  push:
+jobs:
+  validate:
+    name: Validate
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/validate.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
+  test:
+    name: Test
+    needs:
+      - lint
+      - validate
+    permissions:
+      #-- Needed to update check statuses
+      checks: write
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
+  lint:
+    name: Lint
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/lint.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

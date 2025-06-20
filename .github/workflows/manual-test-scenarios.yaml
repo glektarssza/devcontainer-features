@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Manual Test Scenarios
+on:
+  workflow_dispatch:
+jobs:
+  test-scenarios:
+    name: Test Scenarios
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    strategy:
+      fail-fast: true
+      matrix:
+        base-image:
+          - debian:latest
+          - ubuntu:latest
+          - mcr.microsoft.com/devcontainers/base:ubuntu
+    uses: ./.github/workflows/test-scenarios.yaml
+    with:
+      base-image: ${{matrix.base-image}}
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

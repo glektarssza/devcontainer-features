@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: On Release
+on:
+  release:
+    types:
+      - published
+      - released
+      - prereleased
+jobs:
+  validate:
+    name: Validate
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/validate.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
+  test:
+    name: Test
+    needs:
+      - lint
+      - validate
+    permissions:
+      #-- Needed to update check statuses
+      checks: write
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
+  lint:
+    name: Lint
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/lint.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
+  publish-features:
+    name: Publish Features
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - lint
+      - validate
+      - test
+    permissions:
+      #-- Needed to clone repository
+      contents: read
+      #-- Needed to publish updated devcontainer features
+      packages: write
+    uses: ./.github/workflows/publish-features.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
+  update-docs:
+    name: Update Docs
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - lint
+      - validate
+      - test
+    permissions:
+      #-- Needed to write to the repository
+      contents: write
+      #-- Needed to create a pull request
+      pull-requests: write
+    uses: ./.github/workflows/update-docs.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+printf '\x1b[32;5;119mHello, %s!\x1b[0m\n' "$(whoami)";

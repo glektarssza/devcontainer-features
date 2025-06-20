@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Manual Lint
+on:
+  workflow_dispatch:
+    inputs:
+      paths:
+        type: string
+        description: |
+          The paths to scan for issues, separated by commas.
+
+          Defaults to `./src/**/*.sh,./test/**/*.sh`.
+        required: false
+        default: ./src/**/*.sh,./test/**/*.sh
+      severity:
+        type: string
+        description: |
+          The minimum severity to check for.
+
+          Defaults to `style`.
+
+          Valid options are:
+            * `style`
+            * `info`
+            * `warning`
+            * `error`
+        required: false
+        default: style
+      exclude-issues:
+        type: string
+        description: |
+          A comma-separated list of Shellcheck issues to exclude.
+
+          Defaults to nothing.
+        required: false
+jobs:
+  lint:
+    name: Lint
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/lint.yaml
+    with:
+      paths: ${{inputs.paths}}
+      severity: ${{inputs.severity}}
+      exclude-issues: ${{inputs.exclude-issues}}
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Update Docs
+on:
+  workflow_call:
+    secrets:
+      github-token:
+        description: |
+          The token to use for making authenticated calls to the GitHub APIs.
+        required: false
+jobs:
+  update-docs:
+    name: Update Docs
+    runs-on: ubuntu-latest
+    #-- Only run on the main branch
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      #-- Needed to write to the repository
+      contents: write
+      #-- Needed to create a pull request
+      pull-requests: write
+    steps:
+      - id: checkout-repository
+        name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          clean: true
+          lfs: true
+          submodules: recursive
+          token: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
+      - id: generate-updated-docs
+        name: Generate updated docs
+        uses: devcontainers/action@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
+        with:
+          generate-docs: true
+          base-path-to-features: ./src/
+          disable-repo-tagging: true
+      - id: generate-pull-request
+        name: Generate pull request
+        env:
+          GITHUB_TOKEN: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
+        run: |
+          set -e
+          echo "::debug::Beginning to generate pull request...";
+          # Configure Git
+          echo "::debug::Configuring Git...";
+          git config --global user.email github-actions@github.com;
+          git config --global user.name github-actions;
+          git config pull.rebase false;
+          echo "::debug::Git configured";
+          declare BRANCH="docs/automated-update/$GITHUB_RUN_ID"
+          echo "::debug::Checking out a fresh branch...";
+          git checkout -b "$BRANCH"
+          echo "::debug::Checked out to branch '$BRANCH'...";
+          declare MESSAGE="Automated documentation update for GitHub workflow run $GITHUB_RUN_ID."
+          echo "::debug::Adding any updated 'README.md' files...";
+          git add */**/README.md
+          echo "::debug::Added any updated 'README.md' files";
+          echo "::debug::Committing any updated 'README.md' files...";
+          git commit --message "[skip ci] $MESSAGE" || export NO_UPDATES="true"
+          echo "::debug::Committed any updated 'README.md' files";
+          if [[ "$NO_UPDATES" != "true" ]]; then
+            echo "::debug::Pushing updated 'README.md' files...";
+            git push origin "$BRANCH"
+            echo "::debug::Pushed updated 'README.md' files";
+            echo "::debug::Generating a pull request...";
+            gh api --method POST -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" /repos/${GITHUB_REPOSITORY}/pulls \
+              -f title="$MESSAGE" -f head="$BRANCH" -f base="main";
+            echo "::debug::Generated a pull request";
+          else
+            echo "::notice::No 'README.md' files updated, everything okay!";
+          fi

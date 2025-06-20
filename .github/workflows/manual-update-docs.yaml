@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Manual Update Docs
+on:
+  workflow_dispatch:
+jobs:
+  update-docs:
+    name: Update Docs
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      #-- Needed to write to the repository
+      contents: write
+      #-- Needed to create a pull request
+      pull-requests: write
+    uses: ./.github/workflows/update-docs.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

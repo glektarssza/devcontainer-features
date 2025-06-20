@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Manual Validate
+on:
+  workflow_dispatch:
+jobs:
+  validate:
+    name: Validate
+    permissions:
+      #-- Needed to clone the repository
+      contents: read
+    uses: ./.github/workflows/validate.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}

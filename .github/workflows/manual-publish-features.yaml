@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Manual Publish Features
+on:
+  workflow_dispatch:
+jobs:
+  publish-features:
+    name: Publish Features
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      #-- Needed to clone repository
+      contents: read
+      #-- Needed to publish updated devcontainer features
+      packages: write
+    uses: ./.github/workflows/publish-features.yaml
+    secrets:
+      github-token: ${{secrets.GITHUB_TOKEN}}
