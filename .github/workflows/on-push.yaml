@@ -6,8 +6,6 @@ jobs:
   validate:
     name: Validate
     permissions:
-      #-- Needed to update check statuses
-      checks: write
       #-- Needed to clone the repository
       contents: read
     uses: ./.github/workflows/validate.yaml
@@ -19,6 +17,8 @@ jobs:
       - lint
       - validate
     permissions:
+      #-- Needed to update check statuses
+      checks: write
       #-- Needed to clone the repository
       contents: read
     uses: ./.github/workflows/test.yaml
