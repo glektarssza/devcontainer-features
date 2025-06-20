@@ -42,7 +42,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: v24
-          cache: npm
           token: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
       - id: install-devcontainer-cli
         name: Install devcontainer CLI
