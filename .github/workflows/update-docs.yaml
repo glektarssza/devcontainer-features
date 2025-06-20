@@ -42,18 +42,33 @@ jobs:
           GITHUB_TOKEN: ${{secrets.github-token || secrets.GITHUB_TOKEN}}
         run: |
           set -e
-          echo "::debug::Beginning to generate pull request..."
+          echo "::debug::Beginning to generate pull request...";
           # Configure Git
-          git config --global user.email github-actions@github.com
-          git config --global user.name github-actions
-          git config pull.rebase false
+          echo "::debug::Configuring Git...";
+          git config --global user.email github-actions@github.com;
+          git config --global user.name github-actions;
+          git config pull.rebase false;
+          echo "::debug::Git configured";
           declare BRANCH="docs/automated-update/$GITHUB_RUN_ID"
+          echo "::debug::Checking out a fresh branch...";
           git checkout -b "$BRANCH"
+          echo "::debug::Checked out to branch '$BRANCH'...";
           declare MESSAGE="Automated documentation update for GitHub workflow run $GITHUB_RUN_ID."
+          echo "::debug::Adding any updated 'README.md' files...";
           git add */**/README.md
+          echo "::debug::Added any updated 'README.md' files";
+          echo "::debug::Committing any updated 'README.md' files...";
           git commit --message "[skip ci] $MESSAGE" || export NO_UPDATES="true"
-
+          echo "::debug::Committed any updated 'README.md' files";
           if [[ "$NO_UPDATES" != "true" ]]; then
+            echo "::debug::Pushing updated 'README.md' files...";
             git push origin "$BRANCH"
-            gh api --method POST /repos/${GITHUB_REPOSITORY}/pulls -f title="$MESSAGE" -f head="$BRANCH" -f base="main"
+            echo "::debug::Pushed updated 'README.md' files";
+            echo "::debug::Generating a pull request...";
+            gh api --method POST -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" /repos/${GITHUB_REPOSITORY}/pulls \
+              -f title="$MESSAGE" -f head="$BRANCH" -f base="main";
+            echo "::debug::Generated a pull request";
+          else
+            echo "::notice::No 'README.md' files updated, everything okay!";
           fi
