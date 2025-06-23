@@ -39,7 +39,7 @@ if [[ -z "${LIBRARY_DIR}" ]]; then
 fi
 
 #-- Sourcing guard
-if [[ -n "$__LIB_LOGGING" ]]; then
+if [[ -n "${__LIB_LOGGING}" ]]; then
     return 0;
 fi
 declare __LIB_LOGGING="1";

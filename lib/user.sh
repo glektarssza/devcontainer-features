@@ -38,7 +38,8 @@ if [[ -z "${LIBRARY_DIR}" ]]; then
     )";
 fi
 
-source "${LIBRARY_DIR}/graphics.sh";
-source "${LIBRARY_DIR}/logging.sh";
-source "${LIBRARY_DIR}/user.sh";
-source "${LIBRARY_DIR}/os.sh";
+#-- Sourcing guard
+if [[ -n "${__LIB_USER}" ]]; then
+    return 0;
+fi
+declare __LIB_USER="1";

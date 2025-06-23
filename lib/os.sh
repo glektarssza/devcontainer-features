@@ -38,7 +38,34 @@ if [[ -z "${LIBRARY_DIR}" ]]; then
     )";
 fi
 
-source "${LIBRARY_DIR}/graphics.sh";
+#-- Sourcing guard
+if [[ -n "${__LIB_OS}" ]]; then
+    return 0;
+fi
+declare __LIB_OS="1";
+
 source "${LIBRARY_DIR}/logging.sh";
-source "${LIBRARY_DIR}/user.sh";
-source "${LIBRARY_DIR}/os.sh";
+
+# Get the current Linux distribution name.
+function get_distro() {
+    local -a HAYSTACK;
+    local LINE;
+    local OS_INFO;
+    if [[ -f "$(which lsb_release)" ]]; then
+        lsb_release -si 2> /dev/null;
+        return $?;
+    elif [[ -f "$(which hostnamectl)" ]]; then
+        while IFS='' read -r LINE; do HAYSTACK+=("$LINE"); done < <(hostnamectl 2> /dev/null)
+        for LINE in "${HAYSTACK[@]}"; do
+            if [[ "$LINE" =~ Operating\ System:\  ]]; then
+                #-- Rip off the preceding "Operating System: "
+                OS_INFO="${LINE##Operating System: }";
+                #-- Rip off the trailing "GNU/..."
+                echo "${OS_INFO%%GNU*}";
+                return 0;
+            fi
+        done
+        return 1;
+    fi
+    return 1;
+}
